@@ -1,21 +1,23 @@
+// routes/students.js
 import express from 'express';
 import Student from '../model/student.js';
 
-const StudentRouter = express.Router();
+const router = express.Router();
 
 // Create a new student
-StudentRouter.post('/', async (req, res) => {
+router.post('/students', async (req, res) => {
   try {
-    const student = new Student(req.body);
-    const result = await student.save();
-    res.status(201).json(result);
+    const { id, name, age, className } = req.body;
+    const student = new Student({ id, name, age, class: className });
+    const savedStudent = await student.save();
+    res.status(201).json(savedStudent);
   } catch (error) {
     res.status(500).json({ error: 'Error creating a student' });
   }
 });
 
-// Read all students
-StudentRouter.get('/', async (req, res) => {
+// Get all students
+router.get('/students', async (req, res) => {
   try {
     const students = await Student.find();
     res.status(200).json(students);
@@ -24,12 +26,26 @@ StudentRouter.get('/', async (req, res) => {
   }
 });
 
-// Update a student
-StudentRouter.put('/:id', async (req, res) => {
+// Get a student by ID
+router.get('/students/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const student = await Student.findOne({ id });
+    if (!student) {
+      return res.status(404).json({ error: 'Student not found' });
+    }
+    res.status(200).json(student);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching student' });
+  }
+});
+
+// Update a student by ID
+router.put('/students/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const updatedStudent = req.body;
-    const result = await Student.findByIdAndUpdate(id, updatedStudent, { new: true });
+    const result = await Student.findOneAndUpdate({ id }, updatedStudent, { new: true });
     if (!result) {
       return res.status(404).json({ error: 'Student not found' });
     }
@@ -39,11 +55,11 @@ StudentRouter.put('/:id', async (req, res) => {
   }
 });
 
-// Delete a student
-StudentRouter.delete('/:id', async (req, res) => {
+// Delete a student by ID
+router.delete('/students/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await Student.findByIdAndRemove(id);
+    const result = await Student.findOneAndRemove({ id });
     if (!result) {
       return res.status(404).json({ error: 'Student not found' });
     }
@@ -53,4 +69,4 @@ StudentRouter.delete('/:id', async (req, res) => {
   }
 });
 
-export default StudentRouter;
+export default router;

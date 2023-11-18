@@ -1,27 +1,10 @@
-// mark.model.js
+// models/mark.js
 import mongoose from 'mongoose';
 
 const markSchema = new mongoose.Schema({
-  studentId: {
-    type: Number,
-    required: true,
-  },
-  studentName: {
-    type: String,
-    required: true,
-  },
-  teacherName: {
-    type: String,
-    required: true,
-  },
-  subject: {
-    type: String,
-    required: true,
-  },
-  marks: {
-    type: Number,
-    required: true,
-  },
+  student: { type: Number, ref: 'Student', required: true },
+  subject: { type: String, required: true },
+  score: { type: Number, required: true },
 });
 
 const Mark = mongoose.model('Mark', markSchema);

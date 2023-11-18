@@ -2,71 +2,137 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 
-function EditMark() {
-  const { id } = useParams();
+const AddMarks = () => {
+  const { studentId, teacherId } = useParams();
+  const [formData, setFormData] = useState({
+    subject: '',
+    score: '',
+    student: '',
+    teacher: '',
+  });
+  const [students, setStudents] = useState([]);
+  const [teachers, setTeachers] = useState([]);
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    studentId: '',
-    studentName: '',
-    teacherName: '',
-    subject: '',
-    marks: '',
-  });
-
   useEffect(() => {
-    axios.get(`http://localhost:5000/marks/${id}`)
-      .then((response) => {
-        setFormData(response.data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, [id]);
+    const fetchStudentsAndTeachers = async () => {
+      try {
+        const studentsResponse = await axios.get('http://localhost:5000/student/students');
+        setStudents(studentsResponse.data);
+
+        const teachersResponse = await axios.get('http://localhost:5000/teacher/teachers');
+        setTeachers(teachersResponse.data);
+      } catch (error) {
+        console.error('Error fetching students and teachers:', error);
+      }
+    };
+
+    fetchStudentsAndTeachers();
+  }, []);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const response = await axios.put(`http://localhost:5000/marks/${id}`, formData);
-      console.log('Mark updated:', response.data);
-      navigate('/admin');
+      // Send a POST request to add marks
+      await axios.post('http://localhost:5000/mark/marks', {
+        studentId,
+        teacherId,
+        subject: formData.subject,
+        score: formData.score,
+        student: formData.student,
+        teacher: formData.teacher,
+      });
+
+      // Redirect to the marks list page after a brief delay
+      setTimeout(() => {
+        navigate('/allSubjectsMarks');
+      }, 2000); // Redirect after 2 seconds
     } catch (error) {
-      console.error(error);
+      console.error('Error adding marks:', error);
+      // Handle error or show a message to the user
     }
   };
 
   return (
-    <div className="container mt-3">
-      <h2 className="mb-4">Edit Mark</h2>
+    <div className="container mt-5">
+      <h2>Add Marks</h2>
+      <p>Teacher ID: {teacherId}</p>
+      <p>Student ID: {studentId}</p>
       <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label htmlFor="studentId" className="form-label">Student ID</label>
-          <input type="text" className="form-control" name="studentId" value={formData.studentId} onChange={handleChange} required />
+        <div className="form-group">
+          <label>Student:</label>
+          <select
+            className="form-control"
+            name="student"
+            value={formData.student}
+            onChange={handleChange}
+            required
+          >
+            <option value="" disabled>Select Student</option>
+            {students.map((student) => (
+              <option key={student._id} value={student._id}>
+                {student.name}
+              </option>
+            ))}
+          </select>
         </div>
-        <div className="mb-3">
-          <label htmlFor="studentName" className="form-label">Student Name</label>
-          <input type="text" className="form-control" name="studentName" value={formData.studentName} onChange={handleChange} required />
+
+        <div className="form-group">
+          <label>Teacher:</label>
+          <select
+            className="form-control"
+            name="teacher"
+            value={formData.teacher}
+            onChange={handleChange}
+            required
+          >
+            <option value="" disabled>Select Teacher</option>
+            {teachers.map((teacher) => (
+              <option key={teacher._id} value={teacher._id}>
+                {teacher.name}
+              </option>
+            ))}
+          </select>
         </div>
-        <div className="mb-3">
-          <label htmlFor="teacherName" className="form-label">Teacher Name</label>
-          <input type="text" className="form-control" name="teacherName" value={formData.teacherName} onChange={handleChange} required />
+
+        <div className="form-group">
+          <label>Subject:</label>
+          <input
+            type="text"
+            className="form-control"
+            name="subject"
+            value={formData.subject}
+            onChange={handleChange}
+            required
+          />
         </div>
-        <div className="mb-3">
-          <label htmlFor="subject" className="form-label">Subject</label>
-          <input type="text" className="form-control" name="subject" value={formData.subject} onChange={handleChange} required />
+
+        <div className="form-group">
+          <label>Score:</label>
+          <input
+            type="number"
+            className="form-control"
+            name="score"
+            value={formData.score}
+            onChange={handleChange}
+            required
+          />
         </div>
-        <div className="mb-3">
-          <label htmlFor="marks" className="form-label">Marks</label>
-          <input type="number" className="form-control" name="marks" value={formData.marks} onChange={handleChange} required />
-        </div>
-        <button type="submit" className="btn btn-primary">Update Mark</button>
+
+        <button type="submit" className="btn btn-primary">
+          Add Marks
+        </button>
       </form>
     </div>
   );
-}
+};
 
-export default EditMark;
+export default AddMarks;

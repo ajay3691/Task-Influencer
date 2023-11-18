@@ -1,8 +1,13 @@
-const mongoose = require('mongoose');
+// models/student.js
+import mongoose from 'mongoose';
 
 const studentSchema = new mongoose.Schema({
-  name: String,
-  age: Number,
+  id: { type: Number, required: true },
+  name: { type: String, required: true },
+  age: { type: Number, default: 0 },
+  class: { type: String, required: true }, // Add a class field
 });
 
-module.exports = mongoose.model('Student', studentSchema);
+const Student = mongoose.model('Student', studentSchema);
+
+export default Student;

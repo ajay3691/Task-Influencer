@@ -1,53 +1,55 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { store } from '../App';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-//import ProductDashboard from '../ProductCompo/ProductDashbord';
 
 const Myprofile = () => {
     const [token, setToken] = useContext(store);
-    const [data, setData] = useState(null);
-    const navigate = useNavigate(); // Initialize navigate
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (!token) {
             // Redirect to '/login' if token is not available
             navigate('/login');
         } else {
-            axios.get('http://localhost:5000/user/myprofile', {
+            // Fetch data for admin role using 'x-token'
+            axios.get('http://localhost:5000/user/dashboard', {
                 headers: { 'x-token': token }
             })
                 .then((resp) => {
-                    setData(resp.data);
+                    // Handle the data if needed
+                    console.log('Admin Data:', resp.data);
+                    navigate('/dashboard');
                 })
                 .catch((error) => {
                     console.error('Error:', error);
                 });
         }
-    }/* , [token, navigate] */); // Added 'navigate' to the dependency array
+    }, [token, navigate]); // Added 'navigate' to the dependency array
+
+    useEffect(() => {
+        if (!token) {
+            // Redirect to '/login' if token is not available
+            navigate('/login');
+        } else {
+            // Fetch data for teacher role using 'y-token'
+            axios.get('http://localhost:5000/user/teachersBoard', {
+                headers: { 'y-token': token }
+            })
+                .then((resp) => {
+                    // Handle the data if needed
+                    console.log('Teacher Data:', resp.data);
+                    navigate('/teachersBoard');
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
+    }, [token, navigate]);
 
     return (
-        <div className='mt-4 justify-content-center'>
-            <h1 className='display-5 text-center mb-3'> Welcome to Dashboard</h1>
-            {data && (
-                <center>
-                    <div className='card' style={{ "width": "20rem" }}>
-                        <div className='card-header bg-warning'>
-                            <img src='https://thumbs.dreamstime.com/b/vector-illustration-avatar-dummy-logo-collection-image-icon-stock-isolated-object-set-symbol-web-137160339.jpg'
-                                className='img-thumbnail'
-                                width='100%'
-                                height='100%' alt='user_image'
-                            />
-                        </div>
-                        <div className='card-body bg-secondary'>
-                            <h3 className='card-title text-white'> Hii {data.email}....</h3>
-                            <button className='btn btn-primary btn-lg'
-                                onClick={() => setToken(null)}>Logout
-                            </button>
-                        </div>
-                    </div>
-                </center>
-            )}
+        <div>
+            {/* Add content as needed */}
         </div>
     );
 };

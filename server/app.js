@@ -4,7 +4,11 @@ let app = express()
 import mongoose from "mongoose";
 import dotenv from 'dotenv'
 
-import MarksRouter from "./routers/MarksRoute.js"
+//import MarkRouter from "./routers/MarksRouter.js";
+import StudentRouter from "./routers/StudentsRoute.js";
+import TeachersRouter from "./routers/TeachersRoute.js";
+import MarksRouter from "./routers/MarksRouter.js";
+import AuthRouter from "./routers/authRoute.js";
 import morgan from 'morgan'
 import cors from 'cors'
 import bodyParser from "body-parser";
@@ -19,7 +23,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 
-app.use('/marks', MarksRouter); 
+app.use('/student', StudentRouter); 
+app.use('/teacher', TeachersRouter); 
+app.use('/mark', MarksRouter); 
+app.use('/user', AuthRouter); 
 
 app.get("/", (req, resp) => {
     resp.send("Express App - Root APi.......")

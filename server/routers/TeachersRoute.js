@@ -1,21 +1,23 @@
+// routes/teachers.js
 import express from 'express';
 import Teacher from '../model/teacher.js';
 
-const TeacherRouter = express.Router();
+const router = express.Router();
 
 // Create a new teacher
-TeacherRouter.post('/', async (req, res) => {
+router.post('/teachers', async (req, res) => {
   try {
-    const teacher = new Teacher(req.body);
-    const result = await teacher.save();
-    res.status(201).json(result);
+    const { id, name, email, subjects } = req.body;
+    const teacher = new Teacher({ id, name, email, subjects });
+    const savedTeacher = await teacher.save();
+    res.status(201).json(savedTeacher);
   } catch (error) {
     res.status(500).json({ error: 'Error creating a teacher' });
   }
 });
 
-// Read all teachers
-TeacherRouter.get('/', async (req, res) => {
+// Get all teachers
+router.get('/teachers', async (req, res) => {
   try {
     const teachers = await Teacher.find();
     res.status(200).json(teachers);
@@ -24,12 +26,26 @@ TeacherRouter.get('/', async (req, res) => {
   }
 });
 
-// Update a teacher
-TeacherRouter.put('/:id', async (req, res) => {
+// Get a teacher by ID
+router.get('/teachers/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const teacher = await Teacher.findOne({ id });
+    if (!teacher) {
+      return res.status(404).json({ error: 'Teacher not found' });
+    }
+    res.status(200).json(teacher);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching teacher' });
+  }
+});
+
+// Update a teacher by ID
+router.put('/teachers/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const updatedTeacher = req.body;
-    const result = await Teacher.findByIdAndUpdate(id, updatedTeacher, { new: true });
+    const result = await Teacher.findOneAndUpdate({ id }, updatedTeacher, { new: true });
     if (!result) {
       return res.status(404).json({ error: 'Teacher not found' });
     }
@@ -39,11 +55,11 @@ TeacherRouter.put('/:id', async (req, res) => {
   }
 });
 
-// Delete a teacher
-TeacherRouter.delete('/:id', async (req, res) => {
+// Delete a teacher by ID
+router.delete('/teachers/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await Teacher.findByIdAndRemove(id);
+    const result = await Teacher.findOneAndRemove({ id });
     if (!result) {
       return res.status(404).json({ error: 'Teacher not found' });
     }
@@ -53,4 +69,4 @@ TeacherRouter.delete('/:id', async (req, res) => {
   }
 });
 
-export default TeacherRouter;
+export default router;

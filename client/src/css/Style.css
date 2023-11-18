@@ -1,0 +1,33 @@
+/* ProductList.css */
+.product-list-container {
+    /* Add any additional styling for the container */
+  }
+  
+  .product-card {
+    /* Add styling for product cards here */
+    margin-bottom: 20px;
+  }
+  
+  .product-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+  }
+  
+  .product-card .card-body {
+    padding: 10px;
+  }
+  
+  .product-card .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+  }
+  
+  .pagination-container {
+    margin-top: 20px;
+  }
+  
+  /* Add more custom styling as needed */
+  
